@@ -1,929 +1,599 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zero-Trace</title>
+<title>ZERO TRACE</title>
 
 <style>
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
-html,
 body {
-    width: 100%;
-    min-height: 100%;
+    min-height: 100svh;
     background: #000;
-}
-
-body {
-    min-height: 100vh;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: Arial, Helvetica, sans-serif;
     color: #fff;
-
-    background:
-        radial-gradient(
-            circle at 50% 45%,
-            #000d1c 0%,
-            #000409 40%,
-            #000 82%
-        );
-}
-
-
-/* =========================
-   ПРИЗРАКИ НА ФОНЕ
-========================= */
-
-.ghosts {
-    position: fixed;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.ghost {
-    position: absolute;
-
-    width: var(--size);
-    height: var(--size);
-
-    object-fit: contain;
-
-    mix-blend-mode: screen;
-
-    filter:
-        drop-shadow(0 0 5px rgba(0,120,255,.95))
-        drop-shadow(0 0 14px rgba(0,110,255,.65))
-        drop-shadow(0 0 28px rgba(0,80,255,.30));
-
-    opacity: 0;
-
-    will-change: transform, opacity;
-
-    animation:
-        ghostMove var(--duration) ease-in-out infinite,
-        ghostFade var(--fade) ease-in-out infinite;
-
-    animation-delay: var(--delay);
-
-    user-select: none;
-}
-
-
-@keyframes ghostMove {
-
-    0% {
-        transform:
-            translate3d(0,0,0)
-            rotate(-4deg)
-            scale(.90);
-    }
-
-    20% {
-        transform:
-            translate3d(55px,-35px,0)
-            rotate(3deg)
-            scale(1);
-    }
-
-    40% {
-        transform:
-            translate3d(-35px,-75px,0)
-            rotate(-2deg)
-            scale(.96);
-    }
-
-    60% {
-        transform:
-            translate3d(-70px,-30px,0)
-            rotate(4deg)
-            scale(1.04);
-    }
-
-    80% {
-        transform:
-            translate3d(30px,30px,0)
-            rotate(-3deg)
-            scale(.97);
-    }
-
-    100% {
-        transform:
-            translate3d(0,0,0)
-            rotate(-4deg)
-            scale(.90);
-    }
-}
-
-
-@keyframes ghostFade {
-
-    0% {
-        opacity: 0;
-    }
-
-    15% {
-        opacity: var(--opacity);
-    }
-
-    45% {
-        opacity: var(--opacity);
-    }
-
-    72% {
-        opacity: calc(var(--opacity) * .65);
-    }
-
-    90% {
-        opacity: 0;
-    }
-
-    100% {
-        opacity: 0;
-    }
-}
-
-
-/* =========================
-   ЦЕНТРАЛЬНОЕ СВЕЧЕНИЕ
-========================= */
-
-.bg-glow {
-    position: fixed;
-
-    width: 420px;
-    height: 420px;
-
-    left: 50%;
-    top: 50%;
-
-    transform: translate(-50%, -50%);
-
-    background: #007bff;
-
-    filter: blur(190px);
-
-    opacity: .055;
-
-    pointer-events: none;
-
-    z-index: 2;
-}
-
-
-/* =========================
-   ПОДСКАЗКА НА ТЕЛЕФОНЕ
-========================= */
-
-.help {
-    display: none;
-
-    position: fixed;
-
-    top: 10px;
-    right: 10px;
-
-    width: 225px;
-
-    padding: 14px 15px;
-
-    z-index: 30;
-
-    background: rgba(1,5,12,.97);
-
-    border: 1px solid rgba(0,125,255,.65);
-
-    border-radius: 15px;
-
-    box-shadow:
-        0 0 22px rgba(0,100,255,.18);
-
-    font-size: 12px;
-
-    line-height: 1.45;
-}
-
-.help-title {
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.help-text {
-    color: #a0a7b0;
-}
-
-.help-text b {
-    color: #fff;
-}
-
-
-/* =========================
-   СТРЕЛКА
-========================= */
-
-.arrow {
-    position: absolute;
-
-    top: -29px;
-    right: 13px;
-
-    width: 30px;
-    height: 30px;
-
-    pointer-events: none;
-}
-
-.arrow::before {
-    content: "";
-
-    position: absolute;
-
-    width: 3px;
-    height: 25px;
-
-    right: 8px;
-    top: 5px;
-
-    border-radius: 5px;
-
-    background: #007bff;
-
-    transform: rotate(42deg);
-
-    box-shadow:
-        0 0 7px rgba(0,120,255,.8);
-}
-
-.arrow::after {
-    content: "";
-
-    position: absolute;
-
-    width: 10px;
-    height: 10px;
-
-    right: 1px;
-    top: 0;
-
-    border-top: 3px solid #007bff;
-    border-right: 3px solid #007bff;
-
-    transform: rotate(42deg);
-}
-
-
-/* =========================
-   КАРТОЧКА
-========================= */
-
-.card {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+    overflow-x: hidden;
     position: relative;
-
-    width: min(88%, 430px);
-
-    padding: 36px 28px 30px;
-
-    text-align: center;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(2,12,25,.985),
-            rgba(0,3,8,.99)
-        );
-
-    border:
-        1px solid rgba(0,115,255,.38);
-
-    border-radius: 24px;
-
-    box-shadow:
-        0 25px 70px rgba(0,0,0,.9),
-        0 0 40px rgba(0,100,255,.07);
-
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-
-    z-index: 10;
 }
 
-
-.card::before {
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-    left: 15%;
-
-    width: 70%;
-    height: 1px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            #007bff,
-            transparent
-        );
-
-    box-shadow:
-        0 0 10px #007bff;
-}
-
-
-/* =========================
-   ИКОНКА
-========================= */
-
-.icon {
-    width: 64px;
-    height: 64px;
-
-    margin: 0 auto 20px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border-radius: 18px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(0,120,255,.15),
-            rgba(0,25,60,.12)
-        );
-
-    border:
-        1px solid rgba(0,135,255,.5);
-
-    font-size: 28px;
-
-    box-shadow:
-        0 0 25px rgba(0,110,255,.14);
-}
-
-
-/* =========================
-   ЗАГОЛОВОК
-========================= */
-
-h1 {
-    font-size: 30px;
-
-    font-weight: 700;
-
-    margin-bottom: 10px;
-
-    letter-spacing: .3px;
-
-    text-shadow:
-        0 0 20px rgba(0,120,255,.25);
-}
-
-
-/* =========================
-   ОПИСАНИЕ
-========================= */
-
-.description {
-    color: #8e969f;
-
-    font-size: 14px;
-
-    line-height: 1.5;
-
-    margin-bottom: 12px;
-}
-
-
-/* =========================
-   ПОЛЬЗОВАТЕЛИ
-========================= */
-
-.users {
-    display: inline-block;
-
-    margin-bottom: 25px;
-
-    padding: 7px 13px;
-
-    border-radius: 20px;
-
-    background:
-        rgba(0,120,255,.07);
-
-    border:
-        1px solid rgba(0,120,255,.25);
-
-    color: #5eaeff;
-
-    font-size: 12px;
-
-    font-weight: 600;
-
-    box-shadow:
-        0 0 15px rgba(0,100,255,.08);
-}
-
-
-/* =========================
-   КНОПКИ
-========================= */
-
-.buttons {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 13px;
-
-    width: 100%;
-}
-
-.bot-button {
+.top {
     position: relative;
+    z-index: 5;
+}
 
-    display: block;
+.lang {
+    display: flex;
+    gap: 7px;
+}
 
-    width: 100%;
-    height: 58px;
-
-    padding: 0 14px;
-
-    border:
-        1px solid #007bff;
-
-    border-radius: 15px;
-
-    background:
-        linear-gradient(
-            135deg,
-            rgba(0,80,190,.22),
-            rgba(0,10,25,.95)
-        );
-
-    color: #fff;
-
-    font-size: 15px;
-
-    font-weight: 600;
-
+.lang button {
+    background: #000;
+    color: #aaa;
+    border: 1px solid #164c78;
+    border-radius: 9px;
+    padding: 7px 11px;
     cursor: pointer;
-
-    overflow: hidden;
-
-    box-shadow:
-        0 0 16px rgba(0,100,255,.22);
-
-    animation:
-        pulse 3s ease-in-out infinite;
-
-    transition:
-        transform .25s ease,
-        box-shadow .25s ease,
-        border-color .25s ease;
-
-    -webkit-tap-highlight-color: transparent;
-}
-
-
-.bot-button::before {
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-    left: -120%;
-
-    width: 65%;
-    height: 100%;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            rgba(255,255,255,.18),
-            transparent
-        );
-
-    transform: skewX(-25deg);
-}
-
-
-.bot-button:hover::before {
-    animation: shine .8s ease;
-}
-
-
-.bot-button:hover {
-    transform: translateY(-2px);
-
-    border-color: #4da3ff;
-
-    box-shadow:
-        0 0 30px rgba(0,110,255,.48),
-        0 10px 30px rgba(0,0,0,.35);
-}
-
-
-.bot-button:active {
-    transform: scale(.98);
-}
-
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        box-shadow:
-            0 0 14px rgba(0,100,255,.18);
-    }
-
-    50% {
-        box-shadow:
-            0 0 27px rgba(0,110,255,.42),
-            0 0 45px rgba(0,90,255,.08);
-    }
-}
-
-
-@keyframes shine {
-
-    from {
-        left: -120%;
-    }
-
-    to {
-        left: 160%;
-    }
-}
-
-
-/* =========================
-   НИЖНИЙ ТЕКСТ
-========================= */
-
-.footer-text {
-    margin-top: 17px;
-
-    color: #4b535c;
-
     font-size: 11px;
 }
 
+.lang button.active {
+    color: #fff;
+    border-color: #168cff;
+    box-shadow: 0 0 12px #168cff80;
+}
 
-/* =========================
-   МОБИЛЬНАЯ ВЕРСИЯ
-========================= */
+.warning {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 165px;
+    padding: 9px;
+    border: 1px solid #17629b;
+    border-radius: 12px;
+    background: #000;
+    color: #b9dfff;
+    font-size: 10px;
+    line-height: 1.4;
+    text-align: center;
+    box-shadow: 0 0 16px #008cff40;
+    z-index: 10;
+}
 
-@media (max-width: 700px) {
+.warning strong {
+    display: block;
+    color: #fff;
+    margin-bottom: 4px;
+}
 
-    .help {
-        display: block;
+.container {
+    width: 100%;
+    max-width: 640px;
+    margin: 58px auto 0;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.logo {
+    display: inline-block;
+    padding: 11px 27px;
+    border: 1px solid #17629b;
+    border-radius: 12px;
+    background: #000;
+    color: #d8efff;
+    font-size: 13px;
+    letter-spacing: 4px;
+    box-shadow: 0 0 18px #168cff55;
+}
+
+h1 {
+    margin-top: 19px;
+    font-size: clamp(39px, 8vw, 53px);
+    font-weight: 850;
+    letter-spacing: -2px;
+    text-shadow: 0 0 35px #168cff90;
+}
+
+.subtitle {
+    color: #8b9bab;
+    font-size: 15px;
+    margin-top: 7px;
+}
+
+.card {
+    margin-top: 25px;
+    padding: 25px 22px;
+    border: 1px solid #17629b;
+    border-radius: 29px;
+    background: #000;
+    box-shadow:
+        0 0 35px #008cff45,
+        0 0 75px #008cff20,
+        inset 0 0 28px #008cff15;
+    animation: cardAppear .65s ease both, cardGlow 3s infinite alternate;
+}
+
+@keyframes cardAppear {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardGlow {
+    from { box-shadow: 0 0 25px #008cff35, inset 0 0 20px #008cff10; }
+    to { box-shadow: 0 0 43px #008cff65, inset 0 0 30px #008cff20; }
+}
+
+.symbol {
+    width: 65px;
+    height: 65px;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #168cff;
+    border-radius: 20px;
+    background: #000;
+    color: #8bd0ff;
+    font-size: 34px;
+    box-shadow: 0 0 23px #168cff60;
+}
+
+.card h2 {
+    font-size: clamp(22px, 5vw, 28px);
+    margin-bottom: 9px;
+}
+
+.description {
+    color: #8797a8;
+    font-size: 14px;
+    margin-bottom: 19px;
+    line-height: 1.5;
+}
+
+.small-hint {
+    color: #8fcfff;
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0 auto 17px;
+    padding: 10px 12px;
+    border: 1px solid #164c78;
+    border-radius: 12px;
+    background: #000;
+    box-shadow: 0 0 13px #168cff25;
+}
+
+.main-btn {
+    display: block;
+    width: 100%;
+    max-width: 410px;
+    margin: 12px auto 0;
+    padding: 15px 12px;
+    border: 1px solid #168cff;
+    border-radius: 19px;
+    background: #000;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .25s;
+    box-shadow: 0 0 15px #168cff50;
+    animation: buttonPulse 2.5s infinite alternate;
+}
+
+@keyframes buttonPulse {
+    from { box-shadow: 0 0 9px #168cff40; }
+    to { box-shadow: 0 0 25px #168cff95; }
+}
+
+.main-btn:hover {
+    border-color: #65bdff;
+    box-shadow: 0 0 30px #168cffb0;
+    transform: translateY(-2px);
+}
+
+.link-box {
+    padding: 13px;
+    margin: 17px 0;
+    border: 1px solid #164c78;
+    border-radius: 13px;
+    background: #000;
+    color: #9ed5ff;
+    font-size: 12px;
+    word-break: break-all;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+.footer {
+    margin-top: 23px;
+    color: #536477;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+.ghost {
+    position: fixed;
+    z-index: 1;
+    pointer-events: none;
+    object-fit: contain;
+    opacity: 0;
+    filter: drop-shadow(0 0 12px #168cff)
+            drop-shadow(0 0 22px #168cff80);
+    animation: ghostFlight 9s ease-in-out forwards;
+}
+
+@keyframes ghostFlight {
+    0% {
+        opacity: 0;
+        transform: translate(0, 25px) scale(.65) rotate(-12deg);
     }
-
-    .card {
-        width: calc(100% - 30px);
-
-        max-width: 400px;
-
-        padding: 32px 22px 27px;
-
-        border-radius: 22px;
+    15% {
+        opacity: .75;
+        transform: translate(15px, 0) scale(1) rotate(-5deg);
     }
-
-    .icon {
-        width: 58px;
-        height: 58px;
-
-        margin-bottom: 17px;
-
-        font-size: 25px;
+    45% {
+        opacity: .8;
+        transform: translate(45px, -35px) scale(1.08) rotate(7deg);
     }
-
-    h1 {
-        font-size: 27px;
+    75% {
+        opacity: .55;
+        transform: translate(70px, -65px) scale(.95) rotate(12deg);
     }
-
-    .description {
-        font-size: 13px;
-    }
-
-    .users {
-        margin-bottom: 23px;
-    }
-
-    .bot-button {
-        height: 55px;
-
-        font-size: 14px;
-    }
-
-    .ghost {
-        filter:
-            drop-shadow(0 0 5px rgba(0,120,255,.9))
-            drop-shadow(0 0 13px rgba(0,110,255,.55));
+    100% {
+        opacity: 0;
+        transform: translate(110px, -110px) scale(.7) rotate(18deg);
     }
 }
 
-
-/* =========================
-   МАЛЕНЬКИЕ ТЕЛЕФОНЫ
-========================= */
-
-@media (max-width: 380px) {
-
-    .help {
-        width: 210px;
-
-        font-size: 11px;
+@media(max-width: 600px) {
+    .container { margin-top: 64px; }
+    .card { margin-top: 22px; padding: 20px 15px; }
+    .symbol {
+        width: 57px;
+        height: 57px;
+        font-size: 30px;
+        margin-bottom: 11px;
     }
-
-    .help-title {
-        font-size: 13px;
+    .main-btn { padding: 13px 9px; font-size: 13px; }
+    .warning {
+        top: 10px;
+        right: 9px;
+        width: 143px;
+        padding: 7px 8px;
+        font-size: 9px;
     }
+}
 
-    .card {
-        padding: 28px 18px 24px;
-    }
-
-    h1 {
-        font-size: 25px;
-    }
-
-    .bot-button {
-        font-size: 13px;
-    }
+@media(max-width: 380px) {
+    .vpn-btn { font-size: 12px; }
 }
 </style>
 </head>
 
-
 <body>
 
-
-<!-- ПРИЗРАКИ -->
-<div class="ghosts" id="ghosts"></div>
-
-
-<!-- СВЕЧЕНИЕ -->
-<div class="bg-glow"></div>
-
-
-<!-- ПОДСКАЗКА -->
-<div class="help">
-
-    <div class="arrow"></div>
-
-    <div class="help-title">
-        ⚠️ Не открывается?
+<div class="top">
+    <div class="lang">
+        <button id="ruBtn" class="active" onclick="setLang('ru')">RU</button>
+        <button id="enBtn" onclick="setLang('en')">EN</button>
     </div>
-
-    <div class="help-text">
-        Нажми на <b>•••</b> в правом верхнем углу
-        и выбери <b>«Открыть в браузере»</b>.
-    </div>
-
 </div>
 
-
-<!-- ОСНОВНАЯ КАРТОЧКА -->
-<div class="card">
-
-    <div class="icon">
-        ❄️
-    </div>
-
-    <h1>
-        Zero-Trace
-    </h1>
-
-    <div class="description">
-        Выбери нужный раздел ниже
-    </div>
-
-    <div class="users">
-        🔵 1000+ активных пользователей
-    </div>
-
-    <div class="buttons">
-
-        <button
-            class="bot-button"
-            onclick="openBot1()"
-        >
-            🔹 бот для сноса ❄️
-        </button>
-
-        <button
-            class="bot-button"
-            onclick="openBot2()"
-        >
-            🔹 бот для пробива 🔍
-        </button>
-
-    </div>
-
-    <div class="footer-text">
-        🔵 Быстрый переход через Telegram
-    </div>
-
+<div class="warning">
+    <strong id="warningTitle">⚠️ Внимание!</strong>
+    <span id="warningText">
+        Если ссылка не открывается, нажмите на 3 полоски вверху экрана и выберите «Открыть в браузере».
+    </span>
 </div>
 
+<main class="container">
+
+    <div class="logo">ZERO TRACE</div>
+    <h1 id="heading">Переходник</h1>
+    <p class="subtitle" id="subtitle">Выберите нужного бота</p>
+
+    <!-- ГЛАВНОЕ МЕНЮ -->
+    <section class="card page active" id="home">
+        <div class="symbol">👻</div>
+        <h2 id="cardTitle">Выберите сервис</h2>
+        <p class="description" id="description">
+            Нажмите на кнопку ниже, чтобы перейти к нужному сервису.
+        </p>
+
+        <button class="main-btn" onclick="showPage('snos')">
+            Бот для сноса ❄️
+        </button>
+
+        <button class="main-btn" onclick="openSingleBot('probiv')">
+            Бот для пробива 🔍
+        </button>
+
+        <button class="main-btn vpn-btn" onclick="openSingleBot('vpn')" id="vpnBtn">
+            Лучший VPN для анонимности 🕵️‍♂️
+        </button>
+    </section>
+
+    <!-- ВЫБОР БОТА ДЛЯ СНОСА -->
+    <section class="card page" id="snos">
+        <div class="symbol">❄️</div>
+        <h2 id="snosTitle">Бот для сноса</h2>
+
+        <div class="small-hint" id="snosHint">
+            Если бот 1 не работает, попробуйте бот 2.
+        </div>
+
+        <p class="description" id="chooseBotText">
+            Выберите один из вариантов:
+        </p>
+
+        <button class="main-btn" onclick="showBotDetails('bot1')">
+            Бот 1
+        </button>
+
+        <button class="main-btn" onclick="showBotDetails('bot2')">
+            Бот 2
+        </button>
+
+        <button class="main-btn" onclick="showPage('home')" id="backHome">
+            Назад
+        </button>
+    </section>
+
+    <!-- СТРАНИЦА ВЫБРАННОГО БОТА -->
+    <section class="card page" id="botDetails">
+        <div class="symbol">↗</div>
+        <h2 id="detailTitle">Бот 1</h2>
+
+        <div class="small-hint" id="detailHint">
+            Если бот 1 не работает, попробуйте бот 2.
+        </div>
+
+        <p class="description" id="detailDescription">
+            Ссылка на выбранного бота:
+        </p>
+
+        <div class="link-box" id="detailLink"></div>
+
+        <button class="main-btn" onclick="openSelectedBot()" id="detailOpen">
+            Открыть бота
+        </button>
+
+        <button class="main-btn" onclick="copySelectedBot()" id="detailCopy">
+            Скопировать ссылку
+        </button>
+
+        <button class="main-btn" onclick="showPage('snos')" id="backBots">
+            К выбору ботов
+        </button>
+    </section>
+
+    <!-- СТРАНИЦА ПРОБИВА И VPN -->
+    <section class="card page" id="singleDetails">
+        <div class="symbol">🤖</div>
+        <h2 id="singleTitle">Готово!</h2>
+        <p class="description" id="singleDescription">
+            Ссылка на выбранный сервис:
+        </p>
+
+        <div class="link-box" id="singleLink"></div>
+
+        <button class="main-btn" onclick="openSelectedBot()" id="singleOpen">
+            Открыть
+        </button>
+
+        <button class="main-btn" onclick="copySelectedBot()" id="singleCopy">
+            Скопировать ссылку
+        </button>
+
+        <button class="main-btn" onclick="showPage('home')" id="singleBack">
+            Назад
+        </button>
+    </section>
+
+    <div class="footer">ZERO TRACE • OFFICIAL</div>
+
+</main>
 
 <script>
+const links = {
+    bot1: "https://t.me/zerottracebot?start=ref_eyJhnre1ECbTo6ihrP6ne6g",
+    bot2: "https://t.me/aoksdaoskasobot?start=ref_eyJhnre1ECbTo6ihrP6ne6g",
+    probiv: "https://t.me/FaidikS_bot?start=cH7Uft92",
+    vpn: "https://t.me/natriavpnbot?start=partner_8123345032"
+};
 
-/* =========================
-   ССЫЛКИ НА БОТОВ
-========================= */
+let selectedLink = "";
+let selectedBot = "";
 
-const BOT_LINK_1 =
-    "https://t.me/zerottracebot?start=ref_e-Lh933AATFLPET0mx3OowA";
+const translations = {
+    ru: {
+        warningTitle: "⚠️ Внимание!",
+        warningText: "Если ссылка не открывается, нажмите на 3 полоски вверху экрана и выберите «Открыть в браузере».",
+        heading: "Переходник",
+        subtitle: "Выберите нужного бота",
+        cardTitle: "Выберите сервис",
+        description: "Нажмите на кнопку ниже, чтобы перейти к нужному сервису.",
+        vpnBtn: "Лучший VPN для анонимности 🕵️‍♂️",
+        snosTitle: "Бот для сноса ❄️",
+        snosHint: "Если бот 1 не работает, попробуйте бот 2.",
+        chooseBotText: "Выберите один из вариантов:",
+        backHome: "Назад",
+        detailDescription: "Ссылка на выбранного бота:",
+        detailOpen: "Открыть бота",
+        detailCopy: "Скопировать ссылку",
+        backBots: "К выбору ботов",
+        singleDescription: "Ссылка на выбранный сервис:",
+        singleOpen: "Открыть",
+        singleCopy: "Скопировать ссылку",
+        singleBack: "Назад",
+        copied: "Ссылка скопирована!"
+    },
+    en: {
+        warningTitle: "⚠️ Attention!",
+        warningText: "If the link doesn't open, tap the three lines at the top and select Open in browser.",
+        heading: "Redirect",
+        subtitle: "Choose a service",
+        cardTitle: "Choose a service",
+        description: "Click a button below to continue.",
+        vpnBtn: "Best VPN for privacy 🕵️‍♂️",
+        snosTitle: "Removal bot",
+        snosHint: "If bot 1 doesn't work, try bot 2.",
+        chooseBotText: "Choose an option:",
+        backHome: "Back",
+        detailDescription: "Link to the selected bot:",
+        detailOpen: "Open bot",
+        detailCopy: "Copy link",
+        backBots: "Choose another bot",
+        singleDescription: "Link to the selected service:",
+        singleOpen: "Open",
+        singleCopy: "Copy link",
+        singleBack: "Back",
+        copied: "Link copied!"
+    }
+};
 
-const BOT_LINK_2 =
-    "https://t.me/FaidikS_bot?start=cH7Uft92";
+let currentLang = "ru";
 
+function setLang(lang) {
+    currentLang = lang;
+    const t = translations[lang];
 
-function openBot1() {
-    window.location.href = BOT_LINK_1;
+    Object.keys(t).forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = t[id];
+    });
+
+    document.getElementById("ruBtn").classList.toggle("active", lang === "ru");
+    document.getElementById("enBtn").classList.toggle("active", lang === "en");
+
+    if (selectedBot === "bot1" || selectedBot === "bot2") {
+        updateBotDetails();
+    }
 }
 
+function showPage(pageId) {
+    document.querySelectorAll(".page").forEach(page => {
+        page.classList.remove("active");
+    });
 
-function openBot2() {
-    window.location.href = BOT_LINK_2;
+    document.getElementById(pageId).classList.add("active");
 }
 
-
-/* =========================
-   НОВАЯ КАРТИНКА ПРИЗРАКА
-========================= */
-
-const ghostImage =
-    "Без названия18_20260909224116.png";
-
-
-const ghostContainer =
-    document.getElementById("ghosts");
-
-
-/* =========================
-   СОЗДАНИЕ ПРИЗРАКА
-========================= */
-
-function createGhost() {
-
-    const ghost =
-        document.createElement("img");
-
-    ghost.className = "ghost";
-
-    ghost.src = ghostImage;
-
-
-    const size =
-        Math.floor(Math.random() * 61) + 60;
-
-
-    const opacity =
-        (Math.random() * .15 + .18).toFixed(2);
-
-
-    const duration =
-        Math.floor(Math.random() * 8) + 15;
-
-
-    const fade =
-        Math.floor(Math.random() * 5) + 8;
-
-
-    const delay =
-        -Math.floor(Math.random() * 18);
-
-
-    const x =
-        Math.random() * 100;
-
-
-    const y =
-        Math.random() * 100;
-
-
-    ghost.style.setProperty(
-        "--size",
-        size + "px"
-    );
-
-
-    ghost.style.setProperty(
-        "--opacity",
-        opacity
-    );
-
-
-    ghost.style.setProperty(
-        "--duration",
-        duration + "s"
-    );
-
-
-    ghost.style.setProperty(
-        "--fade",
-        fade + "s"
-    );
-
-
-    ghost.style.setProperty(
-        "--delay",
-        delay + "s"
-    );
-
-
-    ghost.style.left =
-        x + "%";
-
-
-    ghost.style.top =
-        y + "%";
-
-
-    ghostContainer.appendChild(ghost);
+function showBotDetails(bot) {
+    selectedBot = bot;
+    selectedLink = links[bot];
+    updateBotDetails();
+    showPage("botDetails");
 }
 
+function updateBotDetails() {
+    const isBot1 = selectedBot === "bot1";
+    const botNumber = isBot1 ? "1" : "2";
+    const otherNumber = isBot1 ? "2" : "1";
 
-/* =========================
-   КОЛИЧЕСТВО ПРИЗРАКОВ
-========================= */
+    document.getElementById("detailTitle").textContent =
+        currentLang === "ru" ? "Бот " + botNumber : "Bot " + botNumber;
 
-const ghostCount =
-    window.innerWidth < 700
-        ? 14
-        : 22;
+    document.getElementById("detailHint").textContent =
+        currentLang === "ru"
+        ? "Если бот " + botNumber + " не работает, попробуйте бот " + otherNumber + "."
+        : "If bot " + botNumber + " doesn't work, try bot " + otherNumber + ".";
 
-
-for (
-    let i = 0;
-    i < ghostCount;
-    i++
-) {
-
-    createGhost();
-
+    document.getElementById("detailLink").textContent = selectedLink;
 }
 
+function openSingleBot(bot) {
+    selectedBot = bot;
+    selectedLink = links[bot];
 
-/* =========================
-   ВОССТАНОВЛЕНИЕ СТРАНИЦЫ
-========================= */
+    const names = {
+        probiv: currentLang === "ru" ? "Бот для пробива 🔍" : "Lookup bot 🔍",
+        vpn: currentLang === "ru" ? "Лучший VPN 🕵️‍♂️" : "Best VPN 🕵️‍♂️"
+    };
 
-function restorePage() {
+    document.getElementById("singleTitle").textContent = names[bot];
+    document.getElementById("singleLink").textContent = selectedLink;
 
-    document.documentElement.style.background =
-        "#000";
-
-    document.body.style.background =
-        "radial-gradient(circle at 50% 45%, #000d1c 0%, #000409 40%, #000000 82%)";
-
-    document.body.style.opacity =
-        "1";
+    showPage("singleDetails");
 }
 
+function openSelectedBot() {
+    if (selectedLink) {
+        window.open(selectedLink, "_blank");
+    }
+}
 
-window.addEventListener(
-    "pageshow",
-    restorePage
-);
+async function copySelectedBot() {
+    if (!selectedLink) return;
 
-
-window.addEventListener(
-    "focus",
-    restorePage
-);
-
-
-document.addEventListener(
-    "visibilitychange",
-    function () {
-
-        if (!document.hidden) {
-            restorePage();
+    try {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(selectedLink);
+        } else {
+            const temp = document.createElement("textarea");
+            temp.value = selectedLink;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            temp.remove();
         }
 
+        alert(translations[currentLang].copied);
+    } catch (error) {
+        alert("Не удалось скопировать. Скопируйте ссылку вручную.");
     }
-);
+}
 
+// Летающие призраки
+const ghostImage = "Без названия18_20260909224116.png";
+let activeGhosts = 0;
+
+function createGhost() {
+    if (activeGhosts >= 7) return;
+
+    activeGhosts++;
+
+    const ghost = document.createElement("img");
+    ghost.src = ghostImage;
+    ghost.className = "ghost";
+    ghost.alt = "";
+
+    const size = 35 + Math.random() * 30;
+
+    ghost.style.width = size + "px";
+    ghost.style.height = size + "px";
+    ghost.style.left = (Math.random() * 85) + "vw";
+    ghost.style.top = (15 + Math.random() * 75) + "vh";
+    ghost.style.animationDuration = (8 + Math.random() * 5) + "s";
+
+    document.body.appendChild(ghost);
+
+    ghost.onerror = () => {
+        ghost.remove();
+        activeGhosts--;
+    };
+
+    ghost.addEventListener("animationend", () => {
+        ghost.remove();
+        activeGhosts--;
+    }, { once: true });
+}
+
+createGhost();
+setInterval(createGhost, 1500);
 </script>
 
 </body>
